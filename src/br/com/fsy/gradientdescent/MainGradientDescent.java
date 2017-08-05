@@ -28,7 +28,7 @@ public class MainGradientDescent {
 	
 	public static void main(String[] args) {
 		GradientDescent gd = new GradientDescent(A_INTERCEPT, B_SLOPE, DATA, PACE);
-		gd.startGradientDescent(500);
+		gd.calculateGradientDescent(500);
 	}
 	
 }

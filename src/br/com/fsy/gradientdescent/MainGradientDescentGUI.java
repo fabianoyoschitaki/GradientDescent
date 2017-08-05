@@ -28,21 +28,23 @@ public class MainGradientDescentGUI extends ApplicationFrame {
 	static {
 		DATA.add(new XY(0.0, 0.0));
 		DATA.add(new XY(0.22,0.22));
-		DATA.add(new XY(0.24,0.58));
-		DATA.add(new XY(0.33,0.20));
-		DATA.add(new XY(0.37,0.55));
-		DATA.add(new XY(0.44,0.39));
-		DATA.add(new XY(0.44,0.54));
-		DATA.add(new XY(0.57,0.53));
-		DATA.add(new XY(0.93,1.0));
-		DATA.add(new XY(1.0,0.61));
+		DATA.add(new XY(0.24,0.60));
+		DATA.add(new XY(0.33,0.61));
+		DATA.add(new XY(0.37,0.80));
+		DATA.add(new XY(0.44,0.86));
+		DATA.add(new XY(0.44,0.84));
+		DATA.add(new XY(0.57,1.10));
+		DATA.add(new XY(0.75,1.30));
+		DATA.add(new XY(0.65,1.40));
+		DATA.add(new XY(0.93,1.7));
+		DATA.add(new XY(1.0,2.03));
 	}
 	
 	private static final BigDecimal PACE = new BigDecimal(0.01).setScale(2, RoundingMode.HALF_DOWN);
 	
 	/** find best a,b using gradient descent **/
-	private static BigDecimal A_INTERCEPT = new BigDecimal(0.45).setScale(XY.SCALE, XY.ROUNDING_MODE);
-	private static BigDecimal B_SLOPE = new BigDecimal(0.75).setScale(XY.SCALE, XY.ROUNDING_MODE);
+	private static BigDecimal A_INTERCEPT = new BigDecimal(0.15).setScale(XY.SCALE, XY.ROUNDING_MODE);
+	private static BigDecimal B_SLOPE = new BigDecimal(-2.15).setScale(XY.SCALE, XY.ROUNDING_MODE);
 	
 	// ****************************************************************************
     // * JFREECHART DEVELOPER GUIDE                                               *
@@ -61,25 +63,47 @@ public class MainGradientDescentGUI extends ApplicationFrame {
      * @param args  ignored.
      */
     public static void main(final String[] args) {
-
-        final MainGradientDescentGUI demo = new MainGradientDescentGUI("MainGradientDescentGUI Demo");
-        demo.pack();
-        RefineryUtilities.centerFrameOnScreen(demo);
-        demo.setVisible(true);
         GradientDescent gd = new GradientDescent(A_INTERCEPT, B_SLOPE, DATA, PACE);
-		gd.startGradientDescent(500);
+		
+		final MainGradientDescentGUI gui = new MainGradientDescentGUI(gd);
+        gui.pack();
+        RefineryUtilities.centerFrameOnScreen(gui);
+        gui.setVisible(true);
+        
+        gd.calculateGradientDescent(100);
+		
+        final MainGradientDescentGUI gui2 = new MainGradientDescentGUI(gd);
+        gui2.pack();
+        RefineryUtilities.centerFrameOnScreen(gui2);
+        gui2.setVisible(true);
+        
+        gd.calculateGradientDescent(300);
+		
+        final MainGradientDescentGUI gui3 = new MainGradientDescentGUI(gd);
+        gui3.pack();
+        RefineryUtilities.centerFrameOnScreen(gui3);
+        gui3.setVisible(true);
+        
+        gd.calculateGradientDescent(300);
+		
+        final MainGradientDescentGUI gui4 = new MainGradientDescentGUI(gd);
+        gui4.pack();
+        RefineryUtilities.centerFrameOnScreen(gui4);
+        gui4.setVisible(true);
+        
+        
     }
 
     /**
      * Constructs the demo application.
      *
-     * @param title  the frame title.
+     * @param gd  the frame title.
      */
-    public MainGradientDescentGUI(final String title) {
-        super(title);
-        XYDataset dataset = createSampleDataset();
+    public MainGradientDescentGUI(final GradientDescent gd) {
+        super("Gradient Descent");
+        XYDataset dataset = createSampleDataset(gd);
         JFreeChart chart = ChartFactory.createXYLineChart(
-            title,
+            "Gradient Descent [" + gd.getCurrentIteration() + "]",
             "X",
             "Y",
             dataset,
@@ -103,21 +127,22 @@ public class MainGradientDescentGUI extends ApplicationFrame {
     
     /**
      * Creates a sample dataset.
+     * @param gd 
      * 
      * @return A dataset.
      */
-    private XYDataset createSampleDataset() {
+    private XYDataset createSampleDataset(GradientDescent gd) {
         XYSeries predictedY = new XYSeries("Predicted Y");
-        predictedY.add(1.0, 3.3);
-        predictedY.add(2.0, 4.4);
-        predictedY.add(3.0, 1.7);
-        
         XYSeries actualY = new XYSeries("Actual Y");
-        actualY.add(1.0, 7.3);
-        actualY.add(2.0, 6.8);
-        actualY.add(3.0, 9.6);
-        actualY.add(4.0, 5.6);
-        
+        List<BigDecimal> xValues = gd.getInitialXValues();
+        List<BigDecimal> yPred = gd.getPredictedY(xValues);
+        List<BigDecimal> yActual = gd.getInitialYValues();
+        for (int cont = 0; cont < xValues.size(); cont++){
+        	predictedY.add(xValues.get(cont), yPred.get(cont));
+        	System.out.println("pred: " + xValues.get(cont) + ", " + yPred.get(cont));
+        	actualY.add(xValues.get(cont), yActual.get(cont));
+        	System.out.println("actual: " + xValues.get(cont) + ", " + yActual.get(cont));
+		}
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(predictedY);
         dataset.addSeries(actualY);

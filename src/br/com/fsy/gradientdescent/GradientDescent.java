@@ -16,6 +16,9 @@ public class GradientDescent {
 	
 	public GradientDescent(BigDecimal intercept, BigDecimal slope,
 		List<XY> data, BigDecimal pace) {
+		if (data == null || data.size() == 0) {
+			throw new IllegalArgumentException("Parameter data must be not null and not empty.");
+		}
 		this.intercept = intercept;
 		this.slope = slope;
 		this.pace = pace;
@@ -32,8 +35,8 @@ public class GradientDescent {
 	 * @param data
 	 * @param pace
 	 */
-	public void startGradientDescent(int iterations) {
-		
+	public void calculateGradientDescent(int iterations) {
+		iterations+= countIteration;
 		while (countIteration < iterations){ 
 			List<BigDecimal> predictedY = getPredictedY(xValues);
 			
@@ -145,7 +148,7 @@ public class GradientDescent {
 	 * @param xValue
 	 * @return the predicted Y value
 	 */
-	public BigDecimal getYPred(BigDecimal x) {
+	private BigDecimal getYPred(BigDecimal x) {
 		return this.intercept.add(this.slope.multiply(x));
 	}
 
@@ -162,6 +165,14 @@ public class GradientDescent {
 		}
 		return predictedY;
 	}
+	
+	public List<BigDecimal> getInitialXValues(){
+		return this.xValues;
+	}
+	
+	public List<BigDecimal> getInitialYValues(){
+		return this.actualY;
+	}
 
 	/**
 	 * Returns the Sum of Squared Errors (SSE) = ½ Sum (Actual House Price –
@@ -172,11 +183,6 @@ public class GradientDescent {
 	 * @return
 	 */
 	public BigDecimal getPredictionError(List<BigDecimal> actualY, List<BigDecimal> predictedY) {
-		if (actualY == null || predictedY == null || actualY.size() == 0
-				|| actualY.size() != predictedY.size()) {
-			throw new IllegalArgumentException(
-					"actualY and predictedY must be not empty and also have the same size.");
-		}
 		BigDecimal sse = new BigDecimal(0);
 		for (int cont = 0; cont < actualY.size(); cont++) {
 			BigDecimal differenceSquared = actualY.get(cont)
@@ -185,5 +191,9 @@ public class GradientDescent {
 			sse = sse.add(differenceSquared);
 		}
 		return sse;
+	}
+
+	public Integer getCurrentIteration() {
+		return this.countIteration;
 	}
 }
